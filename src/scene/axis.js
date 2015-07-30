@@ -32,17 +32,23 @@ vg.scene.axis = function() {
     return tickFormatString || (scale.type === 'log' ? ".1s" : null);
   }
 
+  function getTickFormatFn(fmtStr) {
+    return (!fmtStr && String) || ((scale.type === 'time') ?
+      d3.time.format(fmtStr) : d3.format(fmtStr));
+  }
+
   function buildTickFormat() {
     var fmtStr = getTickFormatString();
+
+    // D3 v3 has an inconsistent tickFormat API for time scales.
     if (scale.tickFormat) {
-      return scale.tickFormat(tickCount, fmtStr);
-    } else if (fmtStr) {
-      return ((scale.type === 'time')
-        ? d3.time.format(fmtStr)
-        : d3.format(fmtStr));
-    } else {
-      return String;
+      return fmtStr ?
+        (scale.tickFormat.length === 2 ?
+          scale.tickFormat(tickCount, fmtStr) : getTickFormatFn(fmtStr)) :
+        scale.tickFormat(tickCount);
     }
+
+    return getTickFormatFn(fmtStr);
   }
 
   function buildTicks(fmt) {
