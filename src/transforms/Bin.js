@@ -1,5 +1,5 @@
-var bins = require('datalib/src/bins/bins'),
-    Tuple = require('vega-dataflow/src/Tuple'),
+var bins = require('datalib').bins,
+    Tuple = require('vega-dataflow').Tuple,
     log = require('vega-logging'),
     Transform = require('./Transform');
 
@@ -18,7 +18,7 @@ function Bin(graph) {
   });
 
   this._output = {'bin': 'bin'};
-  return this;
+  return this.mutates(true);
 }
 
 var prototype = (Bin.prototype = Object.create(Transform.prototype));

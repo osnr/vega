@@ -1,4 +1,4 @@
-var Tuple = require('vega-dataflow/src/Tuple'),
+var Tuple = require('vega-dataflow').Tuple,
     log = require('vega-logging'),
     Transform = require('./Transform');
 
@@ -14,7 +14,7 @@ function LinkPath(graph) {
   });
 
   this._output = {'path': 'layout_path'};
-  return this;
+  return this.mutates(true);
 }
 
 var prototype = (LinkPath.prototype = Object.create(Transform.prototype));

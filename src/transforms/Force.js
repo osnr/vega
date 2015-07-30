@@ -1,6 +1,5 @@
 var d3 = require('d3'),
-    ChangeSet = require('vega-dataflow/src/ChangeSet'),
-    Tuple = require('vega-dataflow/src/Tuple'),
+    Tuple = require('vega-dataflow').Tuple,
     log = require('vega-logging'),
     Transform = require('./Transform');
 
@@ -36,15 +35,11 @@ function Force(graph) {
   this._output = {
     'x': 'layout_x',
     'y': 'layout_y',
-    'px': 'layout_px',
-    'py': 'layout_py',
-    'fixed': 'layout_fixed',
-    'weight': 'layout_weight',
     'source': '_source',
     'target': '_target'
   };
 
-  return this;
+  return this.mutates(true);
 }
 
 var prototype = (Force.prototype = Object.create(Transform.prototype));
@@ -165,7 +160,8 @@ prototype.update = function(active) {
       nodes = this._nodes,
       lut = {}, id, i, n, t, x, y;
 
-  if (fixed) {
+  if (fixed && fixed.source) {
+    // TODO: cache and update as needed?
     fixed = fixed.source.values();
     for (i=0, n=fixed.length; i<n; ++i) {
       lut[fixed[i].id] = 1;
@@ -242,7 +238,7 @@ Force.schema = {
       "default": Infinity
     },
     "iterations": {
-      "description": "The number of iterations to run the force directed layout.",
+      "description": "The number of iterations to run the force directed layout. This setting is ignored if the layout is in interactive mode.",
       "oneOf": [{"type": "number"}, {"$ref": "#/refs/signal"}],
       "default": 500
     },
@@ -265,6 +261,20 @@ Force.schema = {
       "description": "A \"temperature\" parameter that determines how much node positions are adjusted at each step.",
       "oneOf": [{"type": "number"}, {"$ref": "#/refs/signal"}],
       "default": 0.1
+    },
+    "interactive": {
+      "description": "A flag indicating if the layout should run in interactive mode.",
+      "oneOf": [{"type": "boolean"}, {"$ref": "#/refs/signal"}],
+      "default": false
+    },
+    "fixed": {
+      "type": "string",
+      "description": "The name of an optional secondary data set containing the tuple ids (under field 'id') of nodes with fixed positions."
+    },
+    "active": {
+      "description": "A signal indicating an actively dragged node. The signal should include 'id', 'x' and 'y' properties.",
+      "oneOf": [{"$ref": "#/refs/signal"}],
+      "default": null
     },
     "output": {
       "type": "object",
