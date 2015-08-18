@@ -12,7 +12,7 @@ topojson = require("topojson");
 require("d3-geo-projection")(d3);
 
 // load and export vega
-require("./vega");
+var vg = require("./vega");
 // check if we are running in node.js
 vg.config.isNode = typeof process !== 'undefined' && process.title === 'node';
 module.exports = vg;
